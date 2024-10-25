@@ -1,0 +1,48 @@
+# CI de Nível 03 - Disparo automatico sempre que outro for concluido, como deploy
+
+# nome que vai aparecer la nas opções de pipe
+name: 'Execução por Deploy'
+
+# regras de disparo da execucao (triggers/gatilhos)
+# gatilho de exec agendada = schedule
+
+on:
+  workflow_run:
+    workflows: ['Execução Manual']
+    types:
+      - completed
+
+jobs:
+  # descricao do job
+  e2e-tests:
+    # maquina que o job vai executar
+    runs-on: ['ubuntu-latest']
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    # passo a passo das acoes do job
+    steps:
+      - uses: actions/checkout@v4
+
+      # - uses: actions/setup-node@v4
+      #   with:
+      #     node-version: lts/*
+
+      - name: Instalando Yarn
+        run: npm install -g yarn
+
+      - name: Instalando dependências
+        run: yarn
+
+      - name: Instalando Playwright
+        run: yarn playwright install
+
+      - name: Testes E2E (end-to-end)
+        run: yarn run e2e
+
+      # passed, faled, cancelled
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: relatorio-de-testes
+          path: ./playwright-report

@@ -1,0 +1,54 @@
+# nome que vai aparecer no github
+name: 'Execucao integrada'
+# triggers ou gatilhos de execucao
+# gatilho de exec manual = workflow_diospatch
+on:
+  workflow_dispatch:
+
+jobs:
+  inspection:
+    runs-on: Ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalando Yarn
+        run: npm install -g yarn
+
+      - name: Instalando dependências
+        run: yarn
+
+      - name: Padronizacao de codigo (Lint)
+        run: yarn lint
+
+  # - baixar as dependencias
+  # - compilar
+  # - testar
+  e2e-tests:
+    # maquina que vai rodar
+    runs-on: ['ubuntu-latest']
+
+    #passo a paso das acoes do job
+    steps:
+      # - run: echo 'Execucao manual'
+      - uses: actions/checkout@v4
+      # - uses: actions/setup-node@v4
+      #     with:
+      #         node-version: lts/*
+      - name: Instalando Yarn
+        run: npm install -g yarn
+
+      - name: Instalando dependências
+        run: yarn
+
+      - name: Instalando Playwright
+        run: yarn playwright install --with-deps
+
+      - name: Testes E2E (end-to-end)
+        run: yarn run e2e
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: relatorio-de-testes
+          path: ./playwright-report

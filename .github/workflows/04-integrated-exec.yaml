@@ -77,11 +77,11 @@ jobs:
         run: yarn playwright install
 
       - name: Subir a aplicacao local
-        run:  yarn start &
+        run: yarn start &
 
       - name: Testes E2E (end-to-end)
         run: yarn run e2e
-        env:  
+        env:
           URL: 'http://localhost:3000'
 
       # passed, faled, cancelled
@@ -93,7 +93,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [e2e-tests]
-    
-    steps:  
+
+    steps:
       - name: Deploy
         run: echo "step deploy"

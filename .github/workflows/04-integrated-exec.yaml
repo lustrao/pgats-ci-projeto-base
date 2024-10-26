@@ -74,8 +74,13 @@ jobs:
       - name: Instalando Playwright
         run: yarn playwright install
 
+      - name: Subir a aplicacao local
+        run:  yarn start &
+
       - name: Testes E2E (end-to-end)
         run: yarn run e2e
+        env:  
+          URL: 'http://localhost:3000'
 
       # passed, faled, cancelled
       - uses: actions/upload-artifact@v4
